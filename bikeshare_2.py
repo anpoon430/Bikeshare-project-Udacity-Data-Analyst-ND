@@ -1,6 +1,4 @@
-import time
-import pandas as pd
-import numpy as np
+import time,pandas as pd,numpy as np
 
 CITY_DATA = { 'chicago': 'chicago.csv',
               'new york city': 'new_york_city.csv',
@@ -17,14 +15,36 @@ def get_filters():
     """
     print('Hello! Let\'s explore some US bikeshare data!')
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
+    cities={'chicago','new york city','washington'}
+    while True:
+        user_input=input("Which city data are you interested in? (Chicago,New York City,Washington)").lower()
+        if user_input in cities:
+            city=user_input
+            break
+        else:
+            print("Invalid city: Please try again.")
 
 
     # get user input for month (all, january, february, ... , june)
-
-
+    months=['january','february','march','april','may','june','july','august','september','october','november','december']
+    while True:
+        month=input("Which month's data do you want to filter by? Or type 'all' to show all months").lower()
+        if month in months:
+            break
+        elif month=='all':
+            month=months
+        else:
+            print("Invalid month: Please try again.")
     # get user input for day of week (all, monday, tuesday, ... sunday)
-
-
+    days=['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+    while True:
+        day=input("Which day of the week are you interested in? Or type 'all' to show all days of the week").lower()
+        if day in days:
+            break
+        elif day=='all':
+            day=days
+        else:
+            print("Invalid day of the week: Please try again")
     print('-'*40)
     return city, month, day
 
@@ -40,7 +60,7 @@ def load_data(city, month, day):
     Returns:
         df - Pandas DataFrame containing city data filtered by month and day
     """
-
+    df=
 
     return df
 
