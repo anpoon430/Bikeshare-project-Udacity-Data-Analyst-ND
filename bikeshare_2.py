@@ -26,9 +26,9 @@ def get_filters():
 
 
     # get user input for month (all, january, february, ... , june)
-    months=['january','february','march','april','may','june','july','august','september','october','november','december']
+    months=['january','february','march','april','may','june']
     while True:
-        month=input("Which month's data do you want to filter by? Or type 'all' to show all months: ").lower()
+        month=input("Which month's data do you want to filter by?(January to June available) Or type 'all' to show all months: ").lower()
         if month in months:
             break
         elif month=='all':
@@ -106,14 +106,19 @@ def station_stats(df):
     start_time = time.time()
 
     # display most commonly used start station
-
-
+    most_common_startingstation=df['Start Station'].mode()[0]
+    print("The most frequent station to start biking from is: {}.".format(most_common_startingstation))
     # display most commonly used end station
-
+    most_common_endstation=df['End Station'].mode()[0]
+    print("The most frequent destination is {}.".format(most_common_endstation))
 
     # display most frequent combination of start station and end station trip
-
-
+    
+    trip_combination_frequencies=df.groupby(['Start Station','End Station']).size()
+    most_common_trip=trip_combination_frequencies.idxmax()
+   
+    print("Most common trip: {}".format(most_common_trip))
+    
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
@@ -159,11 +164,11 @@ def main():
         df = load_data(city, month, day)
 
         #time_stats(df)
-        #station_stats(df)
+        station_stats(df)
         #trip_duration_stats(df)
         #user_stats(df)
         print("city: {}, month: {}, day: {}".format(city,month,day))
-        print(df.head())
+        #print(df.head())
         restart = input('\nWould you like to restart? Enter yes or no.\n')
         if restart.lower() != 'yes':
             break
