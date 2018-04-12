@@ -1,4 +1,4 @@
-import time,pandas as pd,numpy as np
+import time,pandas as pd,numpy as np,seaborn as sns,matplotlib.pyplot as plt
 
 CITY_DATA = { 'chicago': 'chicago.csv',
               'new york city': 'new_york_city.csv',
@@ -17,6 +17,7 @@ def get_filters():
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
     cities={'chicago','new york city','washington'}
     while True:
+        #store data in user_input, then store into city variable if valid
         user_input=input("Which city data are you interested in? (Chicago,New York City,Washington): ").lower()
         if user_input in cities:
             city=user_input
@@ -28,6 +29,7 @@ def get_filters():
     # get user input for month (all, january, february, ... , june)
     months=['january','february','march','april','may','june']
     while True:
+        #store user input into month variable, if invalid will keep asking user for input until valid
         month=input("Which month's data do you want to filter by?(January to June available) Or type 'all' to show all months: ").lower()
         if month in months:
             break
@@ -78,7 +80,14 @@ def load_data(city, month, day):
 
 
 def time_stats(df):
-    """Displays statistics on the most frequent times of travel."""
+    """
+    Displays statistics on the most frequent times of travel.
+    Using the filtered dataframe, df, from load_data the following statistics are printed out.
+    -month with highest use of bike share
+    -most popular day to use bike share
+    -most common starting hour
+    -hour of day with most uses of bikeshare 
+    """
 
     print('\nCalculating The Most Frequent Times of Travel...\n')
     start_time = time.time()
@@ -102,24 +111,31 @@ def time_stats(df):
 
 
 def station_stats(df):
-    """Displays statistics on the most popular stations and trip."""
+    """
+    Displays statistics on the most popular stations and trip.
+    Takes the filtered dataframe, df, from load_data and prints following statistics:
+    -most popular starting station
+    -most popular ending station
+    -most popular combination of start/end stations
+
+    """
 
     print('\nCalculating The Most Popular Stations and Trip...\n')
     start_time = time.time()
 
     # display most commonly used start station
     most_common_startingstation=df['Start Station'].mode()[0]
-    print("The most frequent station to start biking from is: {}.".format(most_common_startingstation))
+    print("The most frequented station to start biking from is: {}.".format(most_common_startingstation))
     # display most commonly used end station
     most_common_endstation=df['End Station'].mode()[0]
-    print("The most frequent destination is {}.".format(most_common_endstation))
+    print("The most frequented ending station is {}.".format(most_common_endstation))
 
     # display most frequent combination of start station and end station trip
     
-    trip_combination_frequencies=df.groupby(['Start Station','End Station']).size()
-    most_common_trip=trip_combination_frequencies.idxmax()
+    trip_combination_frequencies=df.groupby(['Start Station','End Station']).size()#get frequency table of trip combinations
+    most_common_trip=trip_combination_frequencies.idxmax() #find most popular trip combination 
    
-    print("Most common trip: {}".format(most_common_trip))
+    print("Most popular trip starts and ends respectively at: {}".format(most_common_trip))
     
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -133,17 +149,17 @@ def trip_duration_stats(df):
 
     # display total travel time
     total_travel_time=df['Trip Duration'].sum()
-    print("The total travel time is: {:.2f} days".format(total_travel_time/(3600*24)))
+    print("The total travel time is: {:.2f} days".format(total_travel_time/(3600*24)))#Convert time to days, 2 decimal place 
 
     # display mean travel time
     mean_travel_time=df['Trip Duration'].mean()
-    print("The average travel time is {:.2f} minutes for each trip".format(mean_travel_time/60))
+    print("The average travel time is {:.2f} minutes for each trip".format(mean_travel_time/60))#convert to minutes, 2 decimal place
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
 
-def user_stats(df):
+def user_stats(df,city):
     """Displays statistics on bikeshare users."""
 
     print('\nCalculating User Stats...\n')
@@ -153,30 +169,64 @@ def user_stats(df):
     user_types=df['User Type'].value_counts()
     print("The distribution of user types are:\n {} \n".format(user_types))
 
-
+    if city!='washington':  #washington has no gender/birthyear column
     # Display counts of gender
-    gender=df['Gender'].value_counts()
-    print("The genders of users:\n {}\n".format(gender))
+        gender=df['Gender'].value_counts()
+        print("The genders of users:\n {}\n".format(gender))
 
     # Display earliest, most recent, and most common year of birth
-    min_birth=df['Birth Year'].min()
-    latest_birth=df['Birth Year'].max()
-    common_birth=df['Birth Year'].mode()[0]
-    print("Earliest birth year of users was: {:.0f}\nMost recent birth year of users was: {:.0f}\nMost common birth year was {:.0f}".format(min_birth,latest_birth,common_birth))
+        min_birth=df['Birth Year'].min()
+        latest_birth=df['Birth Year'].max()
+        common_birth=df['Birth Year'].mode()[0]
+        print("Earliest birth year of users was: {:.0f}\nMost recent birth year of users was: {:.0f}\nMost common birth year was {:.0f}".format(min_birth,latest_birth,common_birth))
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
+def tripduration_usertype(df):
+    """
+    Compute the average trip duration based on each user type
+
+    """
+    dur_by_user=df.groupby('User Type')['Trip Duration'].mean()
+    dur_by_user_min=(dur_by_user/60).round(2)   # average trip duration in minutes by user type, to 2 dp
+    print("Average trip duration by user type:\n{}".format(dur_by_user_min))
+
+def tripduration_genderbirth(df):
+    """
+    Compute average trip duration based on gender/birth year
+    Does not apply for washington since no gender/birth year data available
+    """
+    #trip duration by gender
+    dur_by_gender=df.groupby('Gender')['Trip Duration'].mean()
+    dur_by_gender_min=(dur_by_gender/60).round(2) #average trip duration in minutes by gender, to 2 dp
+    print("Average trip duration by gender:\n{}".format(dur_by_gender_min))
+
+    #longest trip duration by birth year
+    dur_by_birth_max=df.groupby('Birth Year')['Trip Duration'].mean().max()
+    dur_idx_max=df.groupby('Birth Year')['Trip Duration'].mean().idxmax()
+    dur_by_birth_max_minutes=(dur_by_birth_max/60).round(2)
+    #shortest trip by birth year
+    dur_by_birth_min=df.groupby('Birth Year')['Trip Duration'].mean().min()
+    dur_idx_min=df.groupby('Birth Year')['Trip Duration'].mean().idxmin()
+    dur_by_birth_min_minutes=(dur_by_birth_min/60).round(2)
+
+    print("Average trip duration by birth year:\nUsers born in {:.0f} spend the most time on a trip, averaging {:.2f} minutes\nUsers born in {:.0f} spend the least time on a trip, averaging: {:.2f} minutes".format(dur_idx_max,dur_by_birth_max_minutes,dur_idx_min,dur_by_birth_min_minutes))
+
+
 
 def main():
     while True:
-        city, month, day = get_filters()
-        df = load_data(city, month, day)
+        city, month, day = get_filters() #get user input in order to filter data
+        df = load_data(city, month, day) #load data and return df that is filtered based on user input
 
-        time_stats(df)
-        station_stats(df)
-        trip_duration_stats(df)
-        user_stats(df)
+        time_stats(df) #print out stats on most frequent times of travel
+        station_stats(df) #print out stats on most frequented stations
+        trip_duration_stats(df) #print out stats on trip total time and average trip time
+        user_stats(df,city) #print out stats on users
+        tripduration_usertype(df)
+        if city!='washington': #washington has no gender/birth data
+            tripduration_genderbirth(df)
         print("city: {}, month: {}, day: {}".format(city,month,day))
         
         restart = input('\nWould you like to restart? Enter yes or no.\n')
