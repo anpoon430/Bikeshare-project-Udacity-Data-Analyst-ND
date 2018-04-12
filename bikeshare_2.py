@@ -67,7 +67,7 @@ def load_data(city, month, day):
     df['day_of_week']=df['Start Time'].dt.weekday_name
 
     if month!='all':
-        months=['january','february','march','april','may','june','july','august','september','october','november','december']
+        months=['january','february','march','april','may','june']
         month=months.index(month)+1
         df=df[df['months']==month]
 
@@ -83,9 +83,11 @@ def time_stats(df):
     print('\nCalculating The Most Frequent Times of Travel...\n')
     start_time = time.time()
 
+
     # display the most common month
-    most_common_month=df['months'].mode()[0]
-    print("People use bikeshare most frequently in {}.".format(most_common_month))
+    months=['january','february','march','april','may','june']
+    most_common_month=df['months'].mode()[0]-1 #index of months starts at 0 so need to subtract 1
+    print("People use bikeshare most frequently in {}.".format(months[most_common_month]))
     # display the most common day of week
     most_common_day=df['day_of_week'].mode()[0]
     print("{} is the most popular day of the week to use bikeshare".format(most_common_day))
@@ -93,7 +95,7 @@ def time_stats(df):
     # display the most common start hour
     df['hours']=df['Start Time'].dt.hour
     most_common_startinghour=df['hours'].mode()[0]
-    print("Most popular hour of the day to use bikeshare is :{}.".format(most_common_startinghour))
+    print("Most popular hour of the day to use bikeshare is: {}.".format(most_common_startinghour))
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -130,10 +132,12 @@ def trip_duration_stats(df):
     start_time = time.time()
 
     # display total travel time
-
+    total_travel_time=df['Trip Duration'].sum()
+    print("The total travel time is: {:.2f} days".format(total_travel_time/(3600*24)))
 
     # display mean travel time
-
+    mean_travel_time=df['Trip Duration'].mean()
+    print("The average travel time is {:.2f} minutes for each trip".format(mean_travel_time/60))
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -146,13 +150,19 @@ def user_stats(df):
     start_time = time.time()
 
     # Display counts of user types
+    user_types=df['User Type'].value_counts()
+    print("The distribution of user types are:\n {} \n".format(user_types))
 
 
     # Display counts of gender
-
+    gender=df['Gender'].value_counts()
+    print("The genders of users:\n {}\n".format(gender))
 
     # Display earliest, most recent, and most common year of birth
-
+    min_birth=df['Birth Year'].min()
+    latest_birth=df['Birth Year'].max()
+    common_birth=df['Birth Year'].mode()[0]
+    print("Earliest birth year of users was: {:.0f}\nMost recent birth year of users was: {:.0f}\nMost common birth year was {:.0f}".format(min_birth,latest_birth,common_birth))
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
@@ -163,12 +173,12 @@ def main():
         city, month, day = get_filters()
         df = load_data(city, month, day)
 
-        #time_stats(df)
+        time_stats(df)
         station_stats(df)
-        #trip_duration_stats(df)
-        #user_stats(df)
+        trip_duration_stats(df)
+        user_stats(df)
         print("city: {}, month: {}, day: {}".format(city,month,day))
-        #print(df.head())
+        
         restart = input('\nWould you like to restart? Enter yes or no.\n')
         if restart.lower() != 'yes':
             break
