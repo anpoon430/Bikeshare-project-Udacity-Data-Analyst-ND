@@ -188,15 +188,24 @@ def tripduration_usertype(df):
     Compute the average trip duration based on each user type
 
     """
+    print('\nCalculating Trip duration based on user type...\n')
+    start_time = time.time()
+
     dur_by_user=df.groupby('User Type')['Trip Duration'].mean()
     dur_by_user_min=(dur_by_user/60).round(2)   # average trip duration in minutes by user type, to 2 dp
     print("Average trip duration by user type:\n{}".format(dur_by_user_min))
 
+
+    print("\nThis took %s seconds." % (time.time() - start_time))
+    print('-'*40)
 def tripduration_genderbirth(df):
     """
     Compute average trip duration based on gender/birth year
     Does not apply for washington since no gender/birth year data available
     """
+    print('\nCalculating Trip duration based on gender and birth year\n')
+    start_time = time.time()
+
     #trip duration by gender
     dur_by_gender=df.groupby('Gender')['Trip Duration'].mean()
     dur_by_gender_min=(dur_by_gender/60).round(2) #average trip duration in minutes by gender, to 2 dp
@@ -213,7 +222,8 @@ def tripduration_genderbirth(df):
 
     print("Average trip duration by birth year:\nUsers born in {:.0f} spend the most time on a trip, averaging {:.2f} minutes\nUsers born in {:.0f} spend the least time on a trip, averaging: {:.2f} minutes".format(dur_idx_max,dur_by_birth_max_minutes,dur_idx_min,dur_by_birth_min_minutes))
 
-
+    print("\nThis took %s seconds." % (time.time() - start_time))
+    print('-'*40)
 
 def main():
     while True:
