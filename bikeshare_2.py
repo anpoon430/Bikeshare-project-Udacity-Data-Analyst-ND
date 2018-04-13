@@ -224,7 +224,29 @@ def tripduration_genderbirth(df):
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
+def display_data(df):
+    """
+    Takes the filtered dataframe, df, and gives the user an option to display the data by 5 row increments.
+    """
+    i=1
+    user_input=input("\nWould you like to view the first five rows of the data? (Yes/No) ").lower()
+    if user_input=='yes':
+        print(df[:i*5])    
+        while True:
+            user_input=input("\nWould you like to view more data? (Yes/No) ").lower()
+            if user_input=='no':break
+            elif user_input=='yes':
+                start_idx=i*5
+                i+=1
+                print("-"*40)
+                print("Displaying the next five rows of data:\n")
+                print(df[start_idx:i*5])
+                print("-"*40)
+    elif user_input=='no': return
+    else:
+        print("Invalid input, please try again.\n")
 
+    
 def main():
     while True:
         city, month, day = get_filters() #get user input in order to filter data
@@ -238,7 +260,8 @@ def main():
         if city!='washington': #washington has no gender/birth data
             tripduration_genderbirth(df)
         print("city: {}, month: {}, day: {}".format(city,month,day))
-        
+        display_data(df) #display data by 5 row increments
+
         restart = input('\nWould you like to restart? Enter yes or no.\n')
         if restart.lower() != 'yes':
             break
